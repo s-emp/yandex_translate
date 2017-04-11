@@ -19,7 +19,10 @@ public class Message implements ITranslatable {
                 translateText = text;
                 //TODO: метод показа сообщения в UI
                 break;
-            case SUGGESTION: break;
+            case SUGGESTION:
+                Log.println(Log.INFO, "TEST SUGGESTION: ", text);
+                break;
+            default: break;
         }
     }
 

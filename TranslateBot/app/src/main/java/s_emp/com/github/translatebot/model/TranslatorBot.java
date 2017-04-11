@@ -6,6 +6,7 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -18,6 +19,8 @@ import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
 import s_emp.com.github.translatebot.ApiTranslate;
 import s_emp.com.github.translatebot.model.dto.DetermiteLangDTO;
+import s_emp.com.github.translatebot.model.dto.LangDTO;
+import s_emp.com.github.translatebot.model.dto.TranslateDTO;
 import s_emp.com.github.translatebot.other.Const;
 import s_emp.com.github.translatebot.other.Helper;
 
@@ -31,8 +34,38 @@ public class TranslatorBot implements ITranslator, IHist, IMark {
     // Автоматическое определение исходного языка
     private boolean isAutoLang = false;
 
+    // Мапа списка языков
+    private Map<String, String> mapLangs = null;
+
+    // Мапа возможных переводов с одного языка на другой
+    private List<String> translateLang = null;
+
+    // Список закладок
+    private List<ITranslatable> mark = null;
+
+    public void refreshMapLangs() {
+        Call<LangDTO> call = ApiTranslate.getApi().getLangs("ru", Const.KEY);
+        call.enqueue(new Callback<LangDTO>() {
+            @Override
+            public void onResponse(Call<LangDTO> call, Response<LangDTO> response) {
+                if (response.code() == 200) {
+                    mapLangs = response.body().getLangs();
+                    translateLang = response.body().getDirs();
+                }
+            }
+
+            @Override
+            public void onFailure(Call<LangDTO> call, Throwable t) {
+                Log.println(Log.ERROR, "Network error ", t.getLocalizedMessage());
+            }
+        });
+    }
+
+    // region Override
+
+    // region Hist
     @Override
-    public ITranslatable getMark() {
+    public ITranslatable getHist(int count) {
         return null;
     }
 
@@ -42,7 +75,25 @@ public class TranslatorBot implements ITranslator, IHist, IMark {
     }
 
     @Override
-    public void translate(ITranslatable translatedObj) throws IOException {
+    public void deleteHist(int from, int to) {
+
+    }
+
+    @Override
+    public void deleteHist(int index) {
+
+    }
+
+    @Override
+    public void deleteHist() {
+
+    }
+    // endregion
+
+    // region Mark
+    @Override
+    public ITranslatable getMark() {
+        return null;
     }
 
     @Override
@@ -51,17 +102,87 @@ public class TranslatorBot implements ITranslator, IHist, IMark {
     }
 
     @Override
-    public ITranslatable getHist(int count) {
-        return null;
-    }
-
-    @Override
     public void addMark(ITranslatable mark) {
 
     }
 
     @Override
-    public String getSourceLang(final ITranslatable translatedObj) throws IOException {
+    public void loadMark() {
+
+    }
+    // endregion
+
+    // region Translate
+
+    @Override
+    public void translate(final ITranslatable translatedObj) throws IOException {
+        Map<String, String> query = new HashMap<>();
+        query.put("key", Const.KEY);
+        query.put("text", translatedObj.getSourceText().substring(0,
+                Helper.getLengthTranslateText(translatedObj.getSourceText())));
+        if (isAutoLang) {
+            query.put("lang", fromLang + "-" + toLang);
+        } else {
+            query.put("lang", toLang);
+        }
+        Call<TranslateDTO> call = ApiTranslate.getApi().translate(query);
+        call.enqueue(new Callback<TranslateDTO>() {
+            @Override
+            public void onResponse(Call<TranslateDTO> call, Response<TranslateDTO> response) {
+                if (response.code() == 200) {
+                    switch (response.body().getCode()) {
+                        case 200:
+                            translatedObj.setTranslatedText(TypeMessage.SUGGESTION,
+                                    response.body().getText());
+                            break;
+                        case 401:
+                            translatedObj.setMessageError(TypeMessage.ERROR_API,
+                                    response.body().getCode(), "Неправильный API-ключ");
+                            break;
+                        case 402:
+                            translatedObj.setMessageError(TypeMessage.ERROR_API,
+                                    response.body().getCode(), "API-ключ заблокирован");
+                            break;
+                        case 403:
+                            translatedObj.setMessageError(TypeMessage.ERROR_API,
+                                    response.body().getCode(), "Превышено суточное ограничение " +
+                                            "на объем переведенного текста");
+                            break;
+                        case 413:
+                            translatedObj.setMessageError(TypeMessage.ERROR_API,
+                                    response.body().getCode(), "Превышен максимальный размер " +
+                                            "текста");
+                            break;
+                        case 422:
+                            translatedObj.setMessageError(TypeMessage.ERROR_API,
+                                    response.body().getCode(), "Текст не может быть переведен");
+                            break;
+                        case 501:
+                            translatedObj.setMessageError(TypeMessage.ERROR_API,
+                                    response.body().getCode(), "Заданое направление перевода " +
+                                            "текста не поддерживается");
+                            break;
+                        default:
+                            translatedObj.setMessageError(TypeMessage.ERROR_API,
+                                    response.body().getCode(), "Не известный код!");
+                    }
+                } else {
+                    translatedObj.setMessageError(TypeMessage.ERROR, response.code(),
+                            response.errorBody().toString());
+                }
+            }
+
+            @Override
+            public void onFailure(Call<TranslateDTO> call, Throwable t) {
+                Log.println(Log.ERROR, "Network error ", t.getLocalizedMessage());
+                translatedObj.setMessageError(TypeMessage.ERROR_API, -200, "Network error " +
+                        t.getLocalizedMessage());
+            }
+        });
+    }
+
+    @Override
+    public void getSourceLang(final ITranslatable translatedObj) throws IOException {
         Map<String, String> query = new HashMap<>();
         query.put("key", Const.KEY);
         query.put("text", translatedObj.getSourceText().substring(0,
@@ -106,38 +227,32 @@ public class TranslatorBot implements ITranslator, IHist, IMark {
                         t.getLocalizedMessage());
             }
         });
-        return "1";
     }
 
     @Override
-    public void deleteHist(int from, int to) {
-
-    }
-
-    @Override
-    public List<String> getLangs() {
-        return null;
-    }
-
-    @Override
-    public void deleteHist(int index) {
-
+    public Map<String, String> getLangs() {
+        return mapLangs;
     }
 
     @Override
     public String getNameLang(String ui) {
-        return null;
+        return mapLangs.get(ui);
     }
 
     @Override
-    public void deleteHist() {
-
+    public List<String> getListLangsTranslate(String ui) {
+        List<String> result = new ArrayList<>();
+        for (int i = 0; i < translateLang.size(); i++) {
+            if (translateLang.get(i).indexOf(ui) >= 0)
+                // Запишем код языка на который можем перевести
+                result.add(translateLang.get(i).split("-")[1]);
+        }
+        return result;
     }
 
-    @Override
-    public Map<String, String> getTranslateLangs() {
-        return null;
-    }
+    // endregion
+
+    // endregion
 
     // Singleton
     public static TranslatorBot getInstanse() {
@@ -146,7 +261,9 @@ public class TranslatorBot implements ITranslator, IHist, IMark {
         }
         return instanse;
     }
-    private TranslatorBot(){}
+    private TranslatorBot(){
+        refreshMapLangs();
+    }
 
     // region Get
 

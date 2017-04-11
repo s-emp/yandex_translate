@@ -14,12 +14,10 @@ public class ChatActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_chat);
-        System.out.println("Test2");
         Message message = new Message();
         message.setSourceText("Привет мир!");
         try {
-            String result  = TranslatorBot.getInstanse().getSourceLang(message);
-            System.out.println(result);
+            TranslatorBot.getInstanse().getSourceLang(message);
         } catch (IOException e) {
             e.printStackTrace();
         }

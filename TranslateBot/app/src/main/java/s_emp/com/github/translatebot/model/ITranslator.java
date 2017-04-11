@@ -11,14 +11,14 @@ public interface ITranslator<T extends ITranslatable> {
     void translate (T TranslatedObj) throws IOException;
 
     // Получение кода языка по тексту
-    String getSourceLang(T TranslatedObj) throws IOException;
+    void getSourceLang(T TranslatedObj) throws IOException;
 
     // Получение списка кодов языков
-    List<String> getLangs();
+    Map<String, String> getLangs();
 
     // Получение название языка по коду
     String getNameLang(String ui);
 
-    // Получение возможных переводов с языка на язык
-    Map<String, String> getTranslateLangs();
+    // Список возможных языков
+    List<String> getListLangsTranslate(String ui);
 }
