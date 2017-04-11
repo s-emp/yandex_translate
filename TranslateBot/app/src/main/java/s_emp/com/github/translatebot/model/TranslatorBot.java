@@ -1,5 +1,7 @@
 package s_emp.com.github.translatebot.model;
 
+import android.util.Log;
+
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 
@@ -16,10 +18,9 @@ import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
 import s_emp.com.github.translatebot.ApiTranslate;
 import s_emp.com.github.translatebot.model.dto.DetermiteLangDTO;
-import s_emp.com.github.translatebot.model.dto.TranslateDTO;
 import s_emp.com.github.translatebot.other.Const;
+import s_emp.com.github.translatebot.other.Helper;
 
-//import static s_emp.com.github.translatebot.ApiTranslate.getApi;
 
 public class TranslatorBot implements ITranslator, IHist, IMark {
 
@@ -42,27 +43,6 @@ public class TranslatorBot implements ITranslator, IHist, IMark {
 
     @Override
     public void translate(ITranslatable translatedObj) throws IOException {
-//        Logger.getGlobal().info("Вызван переводчик.");
-//        System.err.println("Вызван перевод!");
-//        Map<String, String> query = new HashMap<>();
-//        query.put("key", Const.KEY);
-//        // TODO: Сделать обработку длины символов, либо тут, либо на уровне Объекта
-//        query.put("text", translatedObj.getSourceText());
-//        if (isAutoLang) {
-//            query.put("lang", toLang);
-//        } else {
-//            query.put("lang", fromLang + "-" + toLang);
-//        }
-//        Call<TranslateDTO> call = ApiTranslate.getApi().translate(query);
-//        Response<TranslateDTO> response = call.execute();
-//        System.err.println("Ответ: ");
-//        System.err.println("Code:" + response.code());
-//        System.err.println("Body:" + response.body());
-//
-//        switch (response.body().getCode()) {
-//            case 200: translatedObj.setTranslatedText(response.body().getText());
-//            default: translatedObj.setTranslatedText("Неизвестная ошибка");
-//        }
     }
 
     @Override
@@ -81,30 +61,49 @@ public class TranslatorBot implements ITranslator, IHist, IMark {
     }
 
     @Override
-    public String getSourceLang(ITranslatable translatedObj) throws IOException {
-        Gson gson = new GsonBuilder().create();
-        Retrofit retrofit = new Retrofit.Builder()
-            .baseUrl(Const.BASE_URL)
-            .addConverterFactory(GsonConverterFactory.create(gson))
-            .build();
-        IClient translateApi = retrofit.create(IClient.class);
-
+    public String getSourceLang(final ITranslatable translatedObj) throws IOException {
         Map<String, String> query = new HashMap<>();
         query.put("key", Const.KEY);
-        // TODO: Сделать обработку длины символов, либо тут, либо на уровне Объекта
-        query.put("text", translatedObj.getSourceText());
-        Call<DetermiteLangDTO> call = translateApi.getLangText(query);
+        query.put("text", translatedObj.getSourceText().substring(0,
+                Helper.getLengthTranslateText(translatedObj.getSourceText())));
+        Call<DetermiteLangDTO> call = ApiTranslate.getApi().getLangText(query);
         call.enqueue(new Callback<DetermiteLangDTO>() {
             @Override
             public void onResponse(Call<DetermiteLangDTO> call, Response<DetermiteLangDTO> response) {
-                System.out.println("Call: " + call.toString());
-                System.out.println("Response code: " + response.code());
-                System.out.println("Response error body: " + response.errorBody());
+                if (response.code() == 200) {
+                    switch (response.body().getCode()) {
+                        case 200:
+                            translatedObj.setTranslatedText(TypeMessage.SUGGESTION,
+                                    response.body().getLang());
+                            break;
+                        case 401:
+                            translatedObj.setMessageError(TypeMessage.ERROR_API,
+                                    response.body().getCode(), "Неправильный API-ключ");
+                            break;
+                        case 402:
+                            translatedObj.setMessageError(TypeMessage.ERROR_API,
+                                    response.body().getCode(), "API-ключ заблокирован");
+                            break;
+                        case 403:
+                            translatedObj.setMessageError(TypeMessage.ERROR_API,
+                                    response.body().getCode(), "Превышено суточное ограничение " +
+                                            "на объем переведенного текста");
+                            break;
+                        default:
+                            translatedObj.setMessageError(TypeMessage.ERROR_API,
+                                    response.body().getCode(), "Не известный код!");
+                    }
+                } else {
+                    translatedObj.setMessageError(TypeMessage.ERROR, response.code(),
+                            response.errorBody().toString());
+                }
             }
 
             @Override
             public void onFailure(Call<DetermiteLangDTO> call, Throwable t) {
-                System.out.println("MyError: " + t.getLocalizedMessage());
+                Log.println(Log.ERROR, "Network error ", t.getLocalizedMessage());
+                translatedObj.setMessageError(TypeMessage.ERROR_API, -200, "Network error " +
+                        t.getLocalizedMessage());
             }
         });
         return "1";
@@ -148,4 +147,42 @@ public class TranslatorBot implements ITranslator, IHist, IMark {
         return instanse;
     }
     private TranslatorBot(){}
+
+    // region Get
+
+    public String getFromLang() {
+        return fromLang;
+    }
+
+    public String getToLang() {
+        return toLang;
+    }
+
+    public boolean isAutoLang() {
+        return isAutoLang;
+    }
+
+    //endregion
+
+    // region Set
+
+    public void setFromLang(String fromLang) {
+        if (fromLang.equals(toLang)) {
+            toLang = this.fromLang;
+        }
+        this.fromLang = fromLang;
+    }
+
+    public void setToLang(String toLang) {
+        if (toLang.equals(fromLang)) {
+            fromLang = this.toLang;
+        }
+        this.toLang = toLang;
+    }
+
+    public void setAutoLang(boolean autoLang) {
+        isAutoLang = autoLang;
+    }
+
+    // endregion
 }

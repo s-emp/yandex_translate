@@ -1,30 +1,45 @@
 package s_emp.com.github.translatebot.model;
 
-import s_emp.com.github.translatebot.model.ITranslatable;
-
-/**
- * Created by emp on 10.04.17.
- */
+import android.util.Log;
 
 public class Message implements ITranslatable {
 
-    private String message = "";
+    private String translateText = "";
+    private String sourceText = "";
 
     @Override
-    public String getSourceText() {
-        return message;
+    public synchronized String getSourceText() {
+        return sourceText;
     }
 
     @Override
-    public void setTranslatedText(String text) {
-        message = text;
+    public synchronized void setTranslatedText(TypeMessage typeMessage, String text) {
+        switch (typeMessage){
+            case TRANSLATE:
+                translateText = text;
+                //TODO: метод показа сообщения в UI
+                break;
+            case SUGGESTION: break;
+        }
     }
 
-    public String getMessage() {
-        return message;
+    @Override
+    public synchronized void setMessageError(TypeMessage typeMessage, int code, String msg) {
+        switch (typeMessage) {
+            case ERROR:
+                Log.println(Log.ERROR, "Rest error ", code + " " + msg);
+                break;
+            case ERROR_API:
+                Log.println(Log.ERROR, "API error ", code + " " + msg);
+                break;
+        }
     }
 
-    public void setMessage(String message) {
-        this.message = message;
+    public String getTranslateText() {
+        return translateText;
+    }
+
+    public void setSourceText(String sourceText) {
+        this.sourceText = sourceText;
     }
 }

@@ -2,6 +2,8 @@ package s_emp.com.github.translatebot;
 
 import org.junit.Test;
 
+import s_emp.com.github.translatebot.model.Message;
+
 import static org.junit.Assert.*;
 
 /**
@@ -14,8 +16,4 @@ public class ExampleUnitTest {
     public void addition_isCorrect() throws Exception {
         assertEquals(4, 2 + 2);
     }
-
-//    public void translate_isCorrect() throws Exception {
-//        assertEquals(Translate.getInstance().translate("Привет мир!"));
-//    }
 }

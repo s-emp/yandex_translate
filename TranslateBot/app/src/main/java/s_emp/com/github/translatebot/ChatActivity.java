@@ -16,14 +16,14 @@ public class ChatActivity extends AppCompatActivity {
         setContentView(R.layout.activity_chat);
         System.out.println("Test2");
         Message message = new Message();
-        message.setMessage("Привет мир!");
+        message.setSourceText("Привет мир!");
         try {
             String result  = TranslatorBot.getInstanse().getSourceLang(message);
             System.out.println(result);
         } catch (IOException e) {
             e.printStackTrace();
         }
-        System.out.println(message.getMessage());
+        System.out.println(message.getTranslateText());
     }
 
 
