@@ -11,16 +11,18 @@ import java.util.Map;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
-import s_emp.com.github.translatebot.model.dto.DetermiteLangDTO;
-import s_emp.com.github.translatebot.model.dto.LangDTO;
-import s_emp.com.github.translatebot.model.dto.TranslateDTO;
+import s_emp.com.github.translatebot.model.database.IMark;
+import s_emp.com.github.translatebot.model.network.DetermiteLangDTO;
+import s_emp.com.github.translatebot.model.database.IHistory;
+import s_emp.com.github.translatebot.model.network.LangDTO;
+import s_emp.com.github.translatebot.model.network.TranslateDTO;
 import s_emp.com.github.translatebot.other.Const;
 import s_emp.com.github.translatebot.other.Helper;
 
 /* Основной
 *
 */
-public class TranslatorBot implements ITranslator, IHist, IMark {
+public class TranslatorBot implements ITranslator {
 
     private static TranslatorBot instanse;
     // Направление перевода
@@ -59,54 +61,54 @@ public class TranslatorBot implements ITranslator, IHist, IMark {
 
     // region Override
 
-    // region Hist
-    @Override
-    public ITranslatable getHist(int count) {
-        return null;
-    }
-
-    @Override
-    public void addHist(ITranslatable obj) throws IOException {
-
-    }
-
-    @Override
-    public void deleteHist(int from, int to) {
-
-    }
-
-    @Override
-    public void deleteHist(int index) {
-
-    }
-
-    @Override
-    public void deleteHist() {
-
-    }
-    // endregion
-
-    // region Mark
-    @Override
-    public ITranslatable getMark() {
-        return null;
-    }
-
-    @Override
-    public void deleteMark(int index) {
-
-    }
-
-    @Override
-    public void addMark(ITranslatable mark) {
-
-    }
-
-    @Override
-    public void loadMark() {
-
-    }
-    // endregion
+//    // region Hist
+//    @Override
+//    public ITranslatable getHist(int count) {
+//        return null;
+//    }
+//
+//    @Override
+//    public void addHist(ITranslatable obj) throws IOException {
+//
+//    }
+//
+//    @Override
+//    public void deleteHist(int from, int to) {
+//
+//    }
+//
+//    @Override
+//    public void deleteHist(int index) {
+//
+//    }
+//
+//    @Override
+//    public void deleteHist() {
+//
+//    }
+//    // endregion
+//
+//    // region Mark
+//    @Override
+//    public ITranslatable getMark() {
+//        return null;
+//    }
+//
+//    @Override
+//    public void deleteMark(int index) {
+//
+//    }
+//
+//    @Override
+//    public void addMark(ITranslatable mark) {
+//
+//    }
+//
+//    @Override
+//    public void loadMark() {
+//
+//    }
+//    // endregion
 
     // region Translate
 

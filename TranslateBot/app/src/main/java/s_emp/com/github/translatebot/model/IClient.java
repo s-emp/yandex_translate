@@ -7,9 +7,9 @@ import retrofit2.http.FieldMap;
 import retrofit2.http.FormUrlEncoded;
 import retrofit2.http.POST;
 import retrofit2.http.Query;
-import s_emp.com.github.translatebot.model.dto.DetermiteLangDTO;
-import s_emp.com.github.translatebot.model.dto.LangDTO;
-import s_emp.com.github.translatebot.model.dto.TranslateDTO;
+import s_emp.com.github.translatebot.model.network.DetermiteLangDTO;
+import s_emp.com.github.translatebot.model.network.LangDTO;
+import s_emp.com.github.translatebot.model.network.TranslateDTO;
 
 public interface IClient {
 

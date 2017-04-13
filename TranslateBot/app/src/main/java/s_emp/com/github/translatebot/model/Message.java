@@ -3,8 +3,10 @@ package s_emp.com.github.translatebot.model;
 import android.util.Log;
 
 public class Message implements ITranslatable {
-
+    // Перевод текста
     private String translateText = "";
+
+    // Исходный текст
     private String sourceText = "";
 
     @Override

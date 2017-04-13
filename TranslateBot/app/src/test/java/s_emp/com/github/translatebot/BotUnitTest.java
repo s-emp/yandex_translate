@@ -1,12 +1,9 @@
 package s_emp.com.github.translatebot;
 
 import org.junit.Test;
-import org.junit.experimental.theories.Theories;
 
 import java.util.Map;
 
-import s_emp.com.github.translatebot.model.ApiTranslate;
-import s_emp.com.github.translatebot.model.Message;
 import s_emp.com.github.translatebot.model.TranslatorBot;
 
 import static org.junit.Assert.*;

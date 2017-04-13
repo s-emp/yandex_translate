@@ -1,4 +1,4 @@
-package s_emp.com.github.translatebot.model.dto;
+package s_emp.com.github.translatebot.model.network;
 
 import com.google.gson.annotations.SerializedName;
 
