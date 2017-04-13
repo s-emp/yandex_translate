@@ -2,29 +2,24 @@ package s_emp.com.github.translatebot.model;
 
 import android.util.Log;
 
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
-
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.logging.Logger;
 
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
-import retrofit2.Retrofit;
-import retrofit2.converter.gson.GsonConverterFactory;
-import s_emp.com.github.translatebot.ApiTranslate;
 import s_emp.com.github.translatebot.model.dto.DetermiteLangDTO;
 import s_emp.com.github.translatebot.model.dto.LangDTO;
 import s_emp.com.github.translatebot.model.dto.TranslateDTO;
 import s_emp.com.github.translatebot.other.Const;
 import s_emp.com.github.translatebot.other.Helper;
 
-
+/* Основной
+*
+*/
 public class TranslatorBot implements ITranslator, IHist, IMark {
 
     private static TranslatorBot instanse;
@@ -42,6 +37,7 @@ public class TranslatorBot implements ITranslator, IHist, IMark {
 
     // Список закладок
     private List<ITranslatable> mark = null;
+
 
     public void refreshMapLangs() {
         Call<LangDTO> call = ApiTranslate.getApi().getLangs("ru", Const.KEY);
@@ -121,9 +117,9 @@ public class TranslatorBot implements ITranslator, IHist, IMark {
         query.put("text", translatedObj.getSourceText().substring(0,
                 Helper.getLengthTranslateText(translatedObj.getSourceText())));
         if (isAutoLang) {
-            query.put("lang", fromLang + "-" + toLang);
-        } else {
             query.put("lang", toLang);
+        } else {
+            query.put("lang", fromLang + "-" + toLang);
         }
         Call<TranslateDTO> call = ApiTranslate.getApi().translate(query);
         call.enqueue(new Callback<TranslateDTO>() {
@@ -132,7 +128,7 @@ public class TranslatorBot implements ITranslator, IHist, IMark {
                 if (response.code() == 200) {
                     switch (response.body().getCode()) {
                         case 200:
-                            translatedObj.setTranslatedText(TypeMessage.SUGGESTION,
+                            translatedObj.setTranslatedText(TypeMessage.TRANSLATE,
                                     response.body().getText());
                             break;
                         case 401:

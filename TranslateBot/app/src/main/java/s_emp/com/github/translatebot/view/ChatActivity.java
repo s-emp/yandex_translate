@@ -1,10 +1,11 @@
-package s_emp.com.github.translatebot;
+package s_emp.com.github.translatebot.view;
 
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 
 import java.io.IOException;
 
+import s_emp.com.github.translatebot.R;
 import s_emp.com.github.translatebot.model.Message;
 import s_emp.com.github.translatebot.model.TranslatorBot;
 

@@ -1,4 +1,4 @@
-package s_emp.com.github.translatebot;
+package s_emp.com.github.translatebot.model;
 
 import android.app.Application;
 

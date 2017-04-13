@@ -7,13 +7,10 @@ import java.util.List;
 
 public class TranslateDTO {
     @SerializedName("code")
-    @Expose
     private Integer code;
     @SerializedName("lang")
-    @Expose
     private String lang;
     @SerializedName("text")
-    @Expose
     private List<String> text = null;
 
     public Integer getCode() {

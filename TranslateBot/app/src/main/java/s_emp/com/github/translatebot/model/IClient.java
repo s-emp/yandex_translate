@@ -22,7 +22,7 @@ public interface IClient {
     Call<DetermiteLangDTO> getLangText(@FieldMap Map<String, String> map);
 
     @FormUrlEncoded
-    @POST("api/v1.5/tr.json/getLangs")
+    @POST("api/v1.5/tr.json/translate")
     Call<TranslateDTO> translate(@FieldMap Map<String, String> map);
 
 }
