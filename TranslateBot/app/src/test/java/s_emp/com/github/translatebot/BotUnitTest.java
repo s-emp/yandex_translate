@@ -1,6 +1,9 @@
 package s_emp.com.github.translatebot;
 
 import org.junit.Test;
+import org.junit.experimental.theories.Theories;
+
+import java.util.Map;
 
 import s_emp.com.github.translatebot.model.ApiTranslate;
 import s_emp.com.github.translatebot.model.Message;
@@ -8,11 +11,6 @@ import s_emp.com.github.translatebot.model.TranslatorBot;
 
 import static org.junit.Assert.*;
 
-/**
- * Example local unit test, which will execute on the development machine (host).
- *
- * @see <a href="http://d.android.com/tools/testing">Testing documentation</a>
- */
 public class BotUnitTest {
 
     public void pause(TMessage msg) throws Exception {
@@ -42,9 +40,51 @@ public class BotUnitTest {
     }
 
     @Test
-    public void translateHiEn() throws Exception {
+    public void getLang() throws Exception {
+        TMessage msg = new TMessage();
+        msg.sourceText = "Привет";
+        TranslatorBot.getInstanse().getSourceLang(msg);
+        pause(msg);
+        if (!msg.translateText.equals("ru")) {
+            fail("GetLang ru = " + msg.translateText);
+        }
 
+        msg.sourceText = "Hi";
+        TranslatorBot.getInstanse().getSourceLang(msg);
+        pause(msg);
+        if (!msg.translateText.equals("en")) {
+            fail("GetLang en = " + msg.translateText);
+        }
     }
 
+    @Test
+    public void getListLang() throws Exception {
+        TranslatorBot.getInstanse();
+        Thread.sleep(2000);
+        Map<String, String> langs = TranslatorBot.getInstanse().getLangs();
+        if (langs.isEmpty()) {
+            fail("GetListLang is Empty");
+        }
+    }
+
+    @Test
+    public void getSourceLang() throws Exception {
+        TranslatorBot.getInstanse();
+        Thread.sleep(2000);
+        TMessage msg = new TMessage();
+        msg.sourceText = "привет";
+        TranslatorBot.getInstanse().getSourceLang(msg);
+        pause(msg);
+        if (!msg.translateText.equals("ru")) {
+            fail("GetSourceLang ru = " + msg.translateText);
+        }
+
+        msg.sourceText = "hi";
+        TranslatorBot.getInstanse().getSourceLang(msg);
+        pause(msg);
+        if (!msg.translateText.equals("en")) {
+            fail("GetSourceLang en = " + msg.translateText);
+        }
+    }
 
 }

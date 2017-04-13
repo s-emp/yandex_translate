@@ -20,12 +20,7 @@ public class TMessage implements ITranslatable {
 
     @Override
     public void setTranslatedText(TypeMessage typeMessage, String text) {
-        switch (typeMessage) {
-            case TRANSLATE:
-                translateText = text;
-                break;
-            default: break;
-        }
+        translateText = text;
         isFree = true;
     }
 
