@@ -5,6 +5,8 @@ import java.io.IOException;
 import java.util.List;
 import java.util.Map;
 
+import s_emp.com.github.translatebot.presenter.ITranslatable;
+
 public interface ITranslator<T extends ITranslatable> {
 
     // Перевод текста

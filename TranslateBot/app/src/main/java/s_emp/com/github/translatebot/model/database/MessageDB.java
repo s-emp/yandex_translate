@@ -1,6 +1,6 @@
 package s_emp.com.github.translatebot.model.database;
 
-import s_emp.com.github.translatebot.model.ITranslatable;
+import s_emp.com.github.translatebot.presenter.ITranslatable;
 
 public class MessageDB {
 
@@ -14,6 +14,18 @@ public class MessageDB {
     }
 
     public MessageDB(int isBot, ITranslatable message) {
+        this.isBot = isBot;
+        this.message = message.getSourceText();
+    }
+
+    public MessageDB(int id, int isBot, String message) {
+        this.id = id;
+        this.isBot = isBot;
+        this.message = message;
+    }
+
+    public MessageDB(int id, int isBot, ITranslatable message) {
+        this.id = id;
         this.isBot = isBot;
         this.message = message.getSourceText();
     }

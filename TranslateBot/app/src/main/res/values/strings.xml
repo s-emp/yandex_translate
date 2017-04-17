@@ -1,3 +1,5 @@
 <resources>
-    <string name="app_name">TranslateBot</string>
+    <string name="app_name">Переводчик</string>
+    <string name="langFrom">Русский</string>
+    <string name="langTo">Английский</string>
 </resources>

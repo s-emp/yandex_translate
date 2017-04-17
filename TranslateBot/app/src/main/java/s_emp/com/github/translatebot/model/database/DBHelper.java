@@ -10,8 +10,6 @@ import android.database.sqlite.SQLiteOpenHelper;
 import java.io.IOException;
 import java.util.ArrayList;
 
-import s_emp.com.github.translatebot.model.Message;
-
 public class DBHelper extends SQLiteOpenHelper implements IHistory, IMark {
 
 
@@ -82,15 +80,15 @@ public class DBHelper extends SQLiteOpenHelper implements IHistory, IMark {
         Cursor cr;
         if (count > 0) {
             cr = db.query(TABLE_HISTORY, null, null, null, null, null,
-                    COL_HIST_ID + " DESC ", Integer.toString(count));
+                    COL_HIST_ID, Integer.toString(count));
         } else {
             cr = db.query(TABLE_HISTORY, null, null, null, null, null,
-                    COL_HIST_ID + " DESC ", null);
+                    COL_HIST_ID, null);
         }
 
         if (cr.moveToFirst()) {
             do {
-                hists.add(new MessageDB(cr.getInt(1), cr.getString(2)));
+                hists.add(new MessageDB(cr.getInt(0), cr.getInt(1), cr.getString(2)));
             } while (cr.moveToNext());
         }
         db.close();
@@ -102,10 +100,10 @@ public class DBHelper extends SQLiteOpenHelper implements IHistory, IMark {
         ArrayList<MessageDB> hists = new ArrayList<>();
         SQLiteDatabase db = this.getWritableDatabase();
         Cursor cr = db.query(TABLE_HISTORY, null, COL_HIST_ID + " >= ?",
-                new String[]{Integer.toString(from)}, null, null, COL_HIST_ID + " DESC ", null);
+                new String[]{Integer.toString(from)}, null, null, COL_HIST_ID, null);
         if (cr.moveToFirst()) {
             do {
-                hists.add(new MessageDB(cr.getInt(1), cr.getString(2)));
+                hists.add(new MessageDB(cr.getInt(0), cr.getInt(1), cr.getString(2)));
             } while (cr.moveToNext());
         }
         db.close();

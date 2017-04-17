@@ -1,6 +1,6 @@
 package s_emp.com.github.translatebot;
 
-import s_emp.com.github.translatebot.model.ITranslatable;
+import s_emp.com.github.translatebot.presenter.ITranslatable;
 import s_emp.com.github.translatebot.model.TypeMessage;
 
 /**

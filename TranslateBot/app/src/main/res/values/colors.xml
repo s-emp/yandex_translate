@@ -3,4 +3,14 @@
     <color name="colorPrimary">#3F51B5</color>
     <color name="colorPrimaryDark">#303F9F</color>
     <color name="colorAccent">#FF4081</color>
+
+    <!-- Тёмная тема -->
+    <color name="blackMain1">#1A1D22</color>
+    <color name="blackMain2">#202328</color>
+    <color name="blackMain3">#292e34</color>
+    <color name="blackMain4">#747474</color>
+    <color name="blackElement">#308c8c</color>
+
+    <color name="darktheme_color">#308c8c</color>
+
 </resources>

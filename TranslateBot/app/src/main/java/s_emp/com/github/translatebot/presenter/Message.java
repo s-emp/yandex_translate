@@ -1,6 +1,8 @@
-package s_emp.com.github.translatebot.model;
+package s_emp.com.github.translatebot.presenter;
 
 import android.util.Log;
+
+import s_emp.com.github.translatebot.model.TypeMessage;
 
 public class Message implements ITranslatable {
     // Перевод текста

@@ -1,4 +1,6 @@
-package s_emp.com.github.translatebot.model;
+package s_emp.com.github.translatebot.presenter;
+
+import s_emp.com.github.translatebot.model.TypeMessage;
 
 // Интерфейс который должен быть реализован для классов поддерживаемых перевод
 public interface ITranslatable<T extends String> {
