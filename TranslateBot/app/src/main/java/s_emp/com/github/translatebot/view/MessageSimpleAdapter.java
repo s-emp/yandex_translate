@@ -24,13 +24,14 @@ public class MessageSimpleAdapter extends SimpleAdapter {
         super.setViewText(v, text);
         if (v.getId() == R.id.message) {
             if (text.indexOf(Const.FLAG_PEOPLE) >= 0) {
-                v.setPadding(5, 5, 5, 5);
                 FrameLayout.LayoutParams layout =
                         new FrameLayout.LayoutParams(FrameLayout.LayoutParams.WRAP_CONTENT,
                                 FrameLayout.LayoutParams.WRAP_CONTENT,
                                 Gravity.RIGHT);
                 layout.setMargins(100, 5, 10, 5);
                 v.setLayoutParams(layout);
+                v.setPadding(10, 5, 10, 5);
+                v.setBackgroundResource(R.drawable.message_user);
             }
         }
     }

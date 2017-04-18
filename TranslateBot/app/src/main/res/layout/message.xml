@@ -13,7 +13,7 @@
         android:layout_marginTop="5dp"
         android:layout_marginBottom="5dp"
         android:layout_marginLeft="10dp"
-        android:background="@drawable/message_rect"
+        android:background="@drawable/message_bot"
         android:textColor="#ffffff"
         android:paddingLeft="55dp"
         android:paddingRight="5dp"

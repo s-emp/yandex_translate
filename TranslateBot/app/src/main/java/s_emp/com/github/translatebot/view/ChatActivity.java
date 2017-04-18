@@ -23,6 +23,7 @@ import s_emp.com.github.translatebot.other.Const;
 public class ChatActivity extends AppCompatActivity {
 
     private ListView chat;
+    private ListView itemsAction;
     private ImageView send;
     private TextView langTo;
     private TextView langFrom;
@@ -30,8 +31,10 @@ public class ChatActivity extends AppCompatActivity {
     private EditText message;
 
     private Map<String, Object> map;
-    private ArrayList<Map<String, Object>> data;
-    private MessageSimpleAdapter simpleAdapter;
+    private ArrayList<Map<String, Object>> dataChat;
+    private ArrayList<Map<String, Object>> dataItems;
+    private MessageSimpleAdapter chatAdapter;
+    private MessageSimpleAdapter itemsAdapter;
     private int imageBot;
     private DBHelper db;
 
@@ -56,9 +59,10 @@ public class ChatActivity extends AppCompatActivity {
         langTo = (TextView) findViewById(R.id.tvLangTo);
         switchLang = (ImageView) findViewById(R.id.ivSwitchLang);
         message = (EditText) findViewById(R.id.etMessage);
+        itemsAction = (ListView) findViewById(R.id.listAction);
 
         ArrayList<MessageDB> hist = db.getHist(100);
-        data = new ArrayList<>();
+        dataChat = new ArrayList<>();
 
         for (int i = 0; i < hist.size(); i++) {
             map = new HashMap<>();
@@ -68,15 +72,26 @@ public class ChatActivity extends AppCompatActivity {
             } else {
                 map.put(MESSAGE_IMAGE, imageBot);
             }
-            data.add(map);
+            dataChat.add(map);
         }
 
-        String[] from = {MESSAGE_TEXT, MESSAGE_IMAGE};
-        int[] to = {R.id.message, R.id.imageBot};
+        dataItems = new ArrayList<>();
+        for (int i = 0; i < 3; i++) {
+            map = new HashMap<>();
+            map.put(MESSAGE_IMAGE, imageBot);
+            dataItems.add(map);
+        }
 
-        simpleAdapter = new MessageSimpleAdapter(this, data, R.layout.message, from, to);
+        String[] fromChat = {MESSAGE_TEXT, MESSAGE_IMAGE};
+        int[] toChat = {R.id.message, R.id.imageBot};
+        chatAdapter = new MessageSimpleAdapter(this, dataChat, R.layout.message, fromChat, toChat);
+        chat.setAdapter(chatAdapter);
 
-        chat.setAdapter(simpleAdapter);
+        String[] fromIntems = {MESSAGE_IMAGE};
+        int[] toItems = {R.id.imageAction};
+        itemsAdapter = new MessageSimpleAdapter(this, dataItems, R.layout.item_action, fromIntems, toItems);
+        itemsAction.setAdapter(itemsAdapter);
+
     }
 
     public void send(View v) {
@@ -87,10 +102,10 @@ public class ChatActivity extends AppCompatActivity {
             map = new HashMap<>();
             map.put(MESSAGE_TEXT, Const.FLAG_PEOPLE + message.getText().toString());
             map.put(MESSAGE_IMAGE, null);
-            data.add(map);
-            simpleAdapter.notifyDataSetChanged();
+            dataChat.add(map);
+            chatAdapter.notifyDataSetChanged();
             message.setText("");
-            chat.smoothScrollToPosition(data.size());
+            chat.smoothScrollToPosition(dataChat.size());
         } catch (IOException e) {
             e.printStackTrace();
         }

@@ -11,6 +11,7 @@ import java.util.Map;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
+import s_emp.com.github.translatebot.model.database.DBHelper;
 import s_emp.com.github.translatebot.model.network.DetermiteLangDTO;
 import s_emp.com.github.translatebot.model.network.LangDTO;
 import s_emp.com.github.translatebot.model.network.TranslateDTO;
@@ -29,6 +30,9 @@ public class TranslatorBot implements ITranslator {
     private String toLang = "en";
     // Автоматическое определение исходного языка
     private boolean isAutoLang = false;
+
+    // Объект БД
+    private DBHelper dataBase;
 
     // Мапа списка языков
     private Map<String, String> mapLangs = null;

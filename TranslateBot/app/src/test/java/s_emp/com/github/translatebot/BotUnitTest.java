@@ -1,5 +1,8 @@
 package s_emp.com.github.translatebot;
 
+import android.content.Context;
+
+import org.junit.Before;
 import org.junit.Test;
 
 import java.util.Map;
@@ -10,12 +13,18 @@ import static org.junit.Assert.*;
 
 public class BotUnitTest {
 
+    TranslatorBot bot;
+
     public void pause(TMessage msg) throws Exception {
         while (!msg.isFree) {
             Thread.sleep(100);
         }
     }
 
+    @Before
+    public void init() {
+//        bot = new TranslatorBot(new Context());
+    }
     @Test
     public void translateHi() throws Exception {
         TMessage msg = new TMessage();
