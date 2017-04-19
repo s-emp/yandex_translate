@@ -16,4 +16,9 @@ public interface ITranslatable<T extends String> {
                 - ERROR_API - ошибка api yandex
      */
     void setMessageError(TypeMessage typeMessage, int code, String msg);
+
+    /* Возвращает тип сообщения */
+    TypeMessage getTypeMessage();
+
+    String getTranslateText();
 }

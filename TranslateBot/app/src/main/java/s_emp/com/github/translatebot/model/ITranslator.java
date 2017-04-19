@@ -5,12 +5,13 @@ import java.io.IOException;
 import java.util.List;
 import java.util.Map;
 
+import s_emp.com.github.translatebot.presenter.ChatPresenter;
 import s_emp.com.github.translatebot.presenter.ITranslatable;
 
 public interface ITranslator<T extends ITranslatable> {
 
     // Перевод текста
-    void translate (T TranslatedObj) throws IOException;
+    void translate(ITranslatable translatedObj, ChatPresenter chatPresenter) throws IOException;
 
     // Получение кода языка по тексту
     void getSourceLang(T TranslatedObj) throws IOException;

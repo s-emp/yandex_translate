@@ -1,4 +1,4 @@
-package s_emp.com.github.translatebot.view;
+package s_emp.com.github.translatebot.presenter;
 
 import android.content.Context;
 import android.view.Gravity;
@@ -21,7 +21,7 @@ public class MessageSimpleAdapter extends SimpleAdapter {
 
     @Override
     public void setViewText(TextView v, String text) {
-        super.setViewText(v, text);
+        super.setViewText(v, text.substring(text.indexOf(" ")));
         if (v.getId() == R.id.message) {
             if (text.indexOf(Const.FLAG_PEOPLE) >= 0) {
                 FrameLayout.LayoutParams layout =

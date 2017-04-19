@@ -8,6 +8,7 @@ public class Message implements ITranslatable {
     // Перевод текста
     private String translateText = "";
 
+    private TypeMessage typeMessage;
     // Исходный текст
     private String sourceText = "";
 
@@ -21,7 +22,6 @@ public class Message implements ITranslatable {
         switch (typeMessage){
             case TRANSLATE:
                 translateText = text;
-                //TODO: метод показа сообщения в UI
                 break;
             case SUGGESTION:
                 Log.println(Log.INFO, "TEST SUGGESTION: ", text);
@@ -42,11 +42,22 @@ public class Message implements ITranslatable {
         }
     }
 
+    @Override
+    public TypeMessage getTypeMessage() {
+        return typeMessage;
+    }
+
+    @Override
     public String getTranslateText() {
         return translateText;
     }
 
     public void setSourceText(String sourceText) {
+        this.sourceText = sourceText;
+    }
+
+    public Message(TypeMessage typeMessage, String sourceText) {
+        this.typeMessage = typeMessage;
         this.sourceText = sourceText;
     }
 }

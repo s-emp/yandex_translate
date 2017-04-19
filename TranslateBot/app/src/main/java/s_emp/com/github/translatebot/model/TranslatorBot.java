@@ -12,22 +12,24 @@ import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 import s_emp.com.github.translatebot.model.database.DBHelper;
+import s_emp.com.github.translatebot.model.database.MessageDB;
 import s_emp.com.github.translatebot.model.network.DetermiteLangDTO;
 import s_emp.com.github.translatebot.model.network.LangDTO;
 import s_emp.com.github.translatebot.model.network.TranslateDTO;
 import s_emp.com.github.translatebot.other.Const;
 import s_emp.com.github.translatebot.other.Helper;
+import s_emp.com.github.translatebot.presenter.ChatPresenter;
 import s_emp.com.github.translatebot.presenter.ITranslatable;
+import s_emp.com.github.translatebot.view.IChatView;
 
 /* Основной
 *
 */
 public class TranslatorBot implements ITranslator {
 
-    private static TranslatorBot instanse;
     // Направление перевода
-    private String fromLang = "ru";
-    private String toLang = "en";
+    private String fromLang = "en";
+    private String toLang = "ru";
     // Автоматическое определение исходного языка
     private boolean isAutoLang = false;
 
@@ -63,11 +65,12 @@ public class TranslatorBot implements ITranslator {
     }
 
     @Override
-    public void translate(final ITranslatable translatedObj) throws IOException {
+    public void translate(final ITranslatable translatedObj, final ChatPresenter presenter) throws IOException {
+        final String sourceText = translatedObj.getSourceText().substring(0,
+                Helper.getLengthTranslateText(translatedObj.getSourceText()));
         Map<String, String> query = new HashMap<>();
         query.put("key", Const.KEY);
-        query.put("text", translatedObj.getSourceText().substring(0,
-                Helper.getLengthTranslateText(translatedObj.getSourceText())));
+        query.put("text", sourceText);
         if (isAutoLang) {
             query.put("lang", toLang);
         } else {
@@ -82,6 +85,14 @@ public class TranslatorBot implements ITranslator {
                         case 200:
                             translatedObj.setTranslatedText(TypeMessage.TRANSLATE,
                                     response.body().getText());
+                            try {
+                                dataBase.addHist(new MessageDB(1,
+                                        "Изн: " + sourceText + "\n" +
+                                        "Пер: " + response.body().getText() + "\n" +
+                                        "Переведено сервисом «Яндекс.Переводчик»"));
+                            } catch (IOException e) {
+                                e.printStackTrace();
+                            }
                             break;
                         case 401:
                             translatedObj.setMessageError(TypeMessage.ERROR_API,
@@ -118,6 +129,8 @@ public class TranslatorBot implements ITranslator {
                     translatedObj.setMessageError(TypeMessage.ERROR, response.code(),
                             response.errorBody().toString());
                 }
+
+                presenter.updateData(translatedObj);
             }
 
             @Override
@@ -125,6 +138,7 @@ public class TranslatorBot implements ITranslator {
                 Log.println(Log.ERROR, "Network error ", t.getLocalizedMessage());
                 translatedObj.setMessageError(TypeMessage.ERROR_API, -200, "Network error " +
                         t.getLocalizedMessage());
+                presenter.updateData(translatedObj);
             }
         });
     }
@@ -202,15 +216,9 @@ public class TranslatorBot implements ITranslator {
 
     // endregion
 
-    // Singleton
-    public static TranslatorBot getInstanse() {
-        if (instanse == null) {
-            instanse = new TranslatorBot();
-        }
-        return instanse;
-    }
-    private TranslatorBot(){
+    public TranslatorBot(IChatView view){
         refreshMapLangs();
+        dataBase = new DBHelper(view.getActivity());
     }
 
     // region Get
@@ -225,6 +233,10 @@ public class TranslatorBot implements ITranslator {
 
     public boolean isAutoLang() {
         return isAutoLang;
+    }
+
+    public DBHelper getDataBase() {
+        return dataBase;
     }
 
     //endregion
