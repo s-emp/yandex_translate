@@ -91,4 +91,9 @@ public class ChatActivity extends AppCompatActivity implements IChatView {
     public ListView getMenu() {
         return menu;
     }
+
+    @Override
+    public void switchLanguage(View view) {
+        presenter.switchLanguage();
+    }
 }

@@ -67,6 +67,7 @@ public class ChatPresenter implements IChatPresenter {
             dataChat.add(map);
         }
         chatAdapter.notifyDataSetChanged();
+        view.getChat().smoothScrollToPosition(dataChat.size());
     }
 
     @Override
@@ -103,6 +104,7 @@ public class ChatPresenter implements IChatPresenter {
         map.put(MESSAGE_IMAGE, view.getItemImageBot());
         dataChat.add(map);
         chatAdapter.notifyDataSetChanged();
+        view.getChat().smoothScrollToPosition(dataChat.size());
     }
 
     private Message parsingMessage(String message) {
@@ -117,5 +119,10 @@ public class ChatPresenter implements IChatPresenter {
         } else {
             return new Message(TRANSLATE, message);
         }
+    }
+
+    @Override
+    public void switchLanguage() {
+        bot.setToLang();
     }
 }

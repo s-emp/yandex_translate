@@ -10,6 +10,8 @@ public interface IChatView {
     /* Отправить сообщение, событие из view */
     void sendMessage(View view);
 
+    /* Поменять языки перевода */
+    void switchLanguage(View view);
 
     void goToLangTo();
 

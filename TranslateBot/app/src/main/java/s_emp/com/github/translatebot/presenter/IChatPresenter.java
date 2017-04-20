@@ -9,4 +9,6 @@ public interface IChatPresenter {
     void sendMessage(String message);
 
     void updateData(ITranslatable translatedObj);
+
+    void switchLanguage();
 }
