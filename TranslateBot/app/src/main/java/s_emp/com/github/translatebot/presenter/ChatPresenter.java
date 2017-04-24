@@ -127,20 +127,6 @@ public class ChatPresenter implements IChatPresenter {
         view.getChat().smoothScrollToPosition(dataChat.size());
     }
 
-    private Message parsingMessage(String message) {
-        if (message.indexOf("/") == 0) {
-            String tmp = message.substring(0, message.indexOf(" "));
-            switch (tmp) {
-                case "/mark": return new Message(TypeMessage.MARK, message.substring(message.indexOf(" ")));
-                case "/setting": return new Message(TypeMessage.SETTING, message.substring(message.indexOf(" ")));
-                case "/hist": return new Message(TypeMessage.HIST, message.substring(message.indexOf(" ")));
-                default: return new Message(TRANSLATE, message.substring(message.indexOf(" ")));
-            }
-        } else {
-            return new Message(TRANSLATE, message);
-        }
-    }
-
     @Override
     public void switchLanguage() {
         if (!bot.isAutoLang()) {
@@ -248,6 +234,7 @@ public class ChatPresenter implements IChatPresenter {
 
     @Override
     public void showAllMark() {
+        updateData(true, Const.FLAG_MARK + view.getActivity().getString(R.string.showAllMarks), false, false);
         ArrayList<MessageDB> marks = bot.getMark();
         for (MessageDB msg :
                 marks) {

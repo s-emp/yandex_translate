@@ -42,6 +42,7 @@ public class MessageSimpleAdapter extends SimpleAdapter {
         System.out.println("88gg404 bot:" + paddingBot);
         System.out.println("88gg404 user:" + paddingUser);
         if (v.getId() == R.id.message) {
+            // Если это сообщение от пользователя
             if (text.contains(Const.FLAG_PEOPLE)) {
                 super.setViewText(v, text.substring(text.indexOf(" ")));
                 FrameLayout.LayoutParams layout =
@@ -52,7 +53,19 @@ public class MessageSimpleAdapter extends SimpleAdapter {
                 v.setPadding(paddingUser, paddingUser, paddingUser, paddingUser);
                 v.setBackgroundResource(R.drawable.message_user);
                 v.setLayoutParams(layout);
-            }  else {
+                // Если это показ закладок
+            } else if (text.contains(Const.FLAG_MARK)) {
+                super.setViewText(v, text.substring(text.trim().indexOf(" ") + 1));
+                FrameLayout.LayoutParams layout =
+                        new FrameLayout.LayoutParams(FrameLayout.LayoutParams.WRAP_CONTENT,
+                                FrameLayout.LayoutParams.MATCH_PARENT,
+                                Gravity.CENTER_HORIZONTAL);
+                v.setPadding(paddingBotLeft, paddingBot, paddingBot, paddingBot);
+                layout.setMargins(2, 2, 2, 2);
+                v.setPadding(paddingUser, paddingUser, paddingUser, paddingUser);
+                v.setBackgroundResource(R.drawable.message_user);
+                v.setLayoutParams(layout);
+            } else {
                 super.setViewText(v, text);
                 FrameLayout.LayoutParams layout =
                         new FrameLayout.LayoutParams(FrameLayout.LayoutParams.WRAP_CONTENT,

@@ -10,7 +10,7 @@ public class Helper {
 
     // Преобразует сообщение в вид от бота
     public static String messageBot(String text) {
-        if (text.trim().indexOf("/") == 0) {
+        if (text.trim().contains(Const.FLAG_PEOPLE)) {
             if (text.trim().indexOf(" ") > 0) {
                 return text.trim().substring(text.trim().indexOf(" "));
             } else {
