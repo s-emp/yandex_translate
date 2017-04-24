@@ -132,8 +132,8 @@ public class Bot implements IBotTranslate, IBotSetting, IHistory, IMark {
                         case 200:
                             // Запишем историю
                             try {
-                                result = new MessageDB(1, "Изн: " + message + "\n" +
-                                        "Пер: " + response.body().getText());
+                                result = new MessageDB(1, fromLang.toUpperCase() + ": " + message + "\n" +
+                                        toLang.toUpperCase() + ": " + response.body().getText());
                                 dataBase.addHist(result);
                             } catch (IOException e) {
                                 e.printStackTrace();
