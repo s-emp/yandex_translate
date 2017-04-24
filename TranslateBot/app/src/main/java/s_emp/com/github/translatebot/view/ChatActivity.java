@@ -2,6 +2,8 @@ package s_emp.com.github.translatebot.view;
 
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.view.ContextMenu;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.EditText;
@@ -38,6 +40,7 @@ public class ChatActivity extends AppCompatActivity implements IChatView {
         send = (ImageView) findViewById(R.id.ivSend);
         footer = getLayoutInflater().inflate(R.layout.footer, null);
         chat.addFooterView(footer);
+        registerForContextMenu(chat);
 
         langFrom = (Spinner) findViewById(R.id.tvLangFrom);
         langFrom.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
@@ -162,5 +165,20 @@ public class ChatActivity extends AppCompatActivity implements IChatView {
         if (presenter.getPositionToLanguage("ru") > 0) {
             langTo.setSelection(presenter.getPositionToLanguage("ru"));
         }
+    }
+
+    @Override
+    public void onCreateContextMenu(ContextMenu menu, View v, ContextMenu.ContextMenuInfo menuInfo) {
+        super.onCreateContextMenu(menu, v, menuInfo);
+        menu.add(0, CONT_DELETE_ID, 0, R.string.deleteMark);
+    }
+
+    @Override
+    public boolean onContextItemSelected(MenuItem item) {
+        if (item.getItemId() == CONT_DELETE_ID) {
+            presenter.deleteMark(item);
+            return true;
+        }
+        return super.onContextItemSelected(item);
     }
 }

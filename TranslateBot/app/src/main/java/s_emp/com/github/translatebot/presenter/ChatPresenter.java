@@ -6,9 +6,7 @@ import android.widget.AdapterView;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 
 import s_emp.com.github.translatebot.R;
 import s_emp.com.github.translatebot.model.Language;
@@ -18,8 +16,6 @@ import s_emp.com.github.translatebot.model.database.MessageDB;
 import s_emp.com.github.translatebot.other.Const;
 import s_emp.com.github.translatebot.other.Helper;
 import s_emp.com.github.translatebot.view.IChatView;
-
-import static s_emp.com.github.translatebot.model.TypeMessage.TRANSLATE;
 
 public class ChatPresenter implements IChatPresenter {
 
@@ -44,8 +40,7 @@ public class ChatPresenter implements IChatPresenter {
     private final static String SYS_IS_BOT = "bot";
     private final static String SYS_IS_HIST = "hist";
     private final static String SYS_IS_MARK = "mark";
-    private final static String SYS_ID_HIST = "id_hist";
-    private final static String SYS_ID_MARK = "id_mark";
+    private final static String SYS_ID = "id";
 
     // Последний выполненый перевод, для закладок
     private String userText;
@@ -75,8 +70,7 @@ public class ChatPresenter implements IChatPresenter {
         ArrayList<MessageDB> history = bot.getDataBase().getHist(count);
         for (int i = 0; i < history.size(); i++) {
             map = new HashMap<>();
-            map.put(SYS_ID_HIST, history.get(i).getId());
-            map.put(SYS_ID_MARK, 0);
+            map.put(SYS_ID, history.get(i).getId());
             map.put(MESSAGE_TEXT, history.get(i).getMessage());
             map.put(MESSAGE_IMAGE, view.getItemImageBot());
             map.put(SYS_IS_BOT, true);
@@ -122,6 +116,26 @@ public class ChatPresenter implements IChatPresenter {
         map.put(SYS_IS_HIST, isHist);
         map.put(SYS_IS_MARK, isMark);
         map.put(SYS_IS_BOT, isBot);
+
+        dataChat.add(map);
+        chatAdapter.notifyDataSetChanged();
+        view.getChat().smoothScrollToPosition(dataChat.size());
+    }
+
+    synchronized public void updateData(boolean isBot, MessageDB text, boolean isHist, boolean isMark) {
+        map = new HashMap<>();
+        map.put(SYS_ID, text.getId());
+        if (isBot) {
+            map.put(MESSAGE_TEXT, Helper.messageBot(text.getMessage()));
+            map.put(MESSAGE_IMAGE, view.getItemImageBot());
+        } else {
+            map.put(MESSAGE_TEXT, text);
+            map.put(MESSAGE_IMAGE, null);
+        }
+        map.put(SYS_IS_HIST, isHist);
+        map.put(SYS_IS_MARK, isMark);
+        map.put(SYS_IS_BOT, isBot);
+
         dataChat.add(map);
         chatAdapter.notifyDataSetChanged();
         view.getChat().smoothScrollToPosition(dataChat.size());
@@ -225,9 +239,19 @@ public class ChatPresenter implements IChatPresenter {
             view.systemMessage("Все закладки удалены");
         } else {
             AdapterView.AdapterContextMenuInfo info = (AdapterView.AdapterContextMenuInfo) item.getMenuInfo();
+            if (info.position >= dataChat.size()) return;
             Map<String, Object> tmp = dataChat.get(info.position);
-            if (tmp.get(SYS_ID_MARK) != null) {
-                bot.deleteMark((int) tmp.get(SYS_ID_MARK));
+            if (tmp.get(SYS_IS_MARK) != null) {
+                if ((boolean) tmp.get(SYS_IS_MARK)) {
+                    if (tmp.get(SYS_ID) != null) {
+                        bot.deleteMark((int) ((long) tmp.get(SYS_ID)));
+                        view.systemMessage(view.getActivity().getString(R.string.successDeleteMark));
+                        dataChat.remove(info.position);
+                        chatAdapter.notifyDataSetChanged();
+                    }
+                } else {
+                    view.systemMessage(view.getActivity().getString(R.string.errorDeleteMessage));
+                }
             }
         }
     }
@@ -238,7 +262,7 @@ public class ChatPresenter implements IChatPresenter {
         ArrayList<MessageDB> marks = bot.getMark();
         for (MessageDB msg :
                 marks) {
-            updateData(true, msg.getMessage(), false, true);
+            updateData(true, msg, false, true);
         }
     }
 

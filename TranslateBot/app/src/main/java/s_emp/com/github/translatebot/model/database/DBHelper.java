@@ -152,6 +152,10 @@ public class DBHelper extends SQLiteOpenHelper implements IHistory, IMark {
             SQLiteDatabase database = this.getWritableDatabase();
             database.delete(TABLE_MARK, null, null);
             database.close();
+        } else {
+            SQLiteDatabase database = this.getWritableDatabase();
+            database.delete(TABLE_MARK, COL_MARK_ID + " = ?", new String[]{Integer.toString(index)});
+            database.close();
         }
     }
 

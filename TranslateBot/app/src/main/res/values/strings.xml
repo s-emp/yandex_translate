@@ -8,4 +8,7 @@
     <string name="fromLanguage">Изначальный язык</string>
     <string name="toLanguage">На который переводим</string>
     <string name="showAllMarks">Все ваши закладки:</string>
+    <string name="deleteMark">Удалить закладку</string>
+    <string name="errorDeleteMessage">Данное сообщение не находится в закладках, его удалить нельзя!</string>
+    <string name="successDeleteMark">Закладка успешно удалена.</string>
 </resources>
