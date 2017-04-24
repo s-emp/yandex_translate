@@ -2,4 +2,9 @@
     <string name="app_name">Переводчик</string>
     <string name="langFrom">Русский</string>
     <string name="langTo">Английский</string>
+    <string name="placeholderText">Текст</string>
+    <string name="FAQ">К сожалению я ваc не понял, что бы посмотреть что я умею, воспользуйтесь FAQ.</string>
+    <string name="license">Переведено сервисом «Яндекс Переводчик» \n <a href="http://translate.yandex.ru/">http://translate.yandex.ru/</a></string>
+    <string name="fromLanguage">Изначальный язык</string>
+    <string name="toLanguage">На который переводим</string>
 </resources>

@@ -1,15 +1,28 @@
 package s_emp.com.github.translatebot.model;
 
-/**
- * Created by emp on 20.04.17.
- */
-
-public class Language {
+public class Language{
+    private String ui;
     private String nameLanguage;
-    private String uiLanguage;
 
-    public Language(String nameLanguage, String uiLanguage) {
+    public Language(String ui, String nameLanguage) {
+        this.ui = ui;
         this.nameLanguage = nameLanguage;
-        this.uiLanguage = uiLanguage;
     }
+
+    public String getUi() {
+        return ui;
+    }
+
+    public void setUi(String ui) {
+        this.ui = ui;
+    }
+
+    public String getNameLanguage() {
+        return nameLanguage;
+    }
+
+    public void setNameLanguage(String nameLanguage) {
+        this.nameLanguage = nameLanguage;
+    }
+
 }

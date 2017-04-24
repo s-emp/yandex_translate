@@ -15,7 +15,7 @@ public interface IHistory {
     ArrayList<MessageDB> getHist(int from, int to);
 
     // Удалить начиная от и заканчивая до значений из истории
-    //void deleteHist(int from, int to);
+    //void deletehist(int from, int to);
 
     // Удалить значение из истории по index
     void deleteHist(int index);

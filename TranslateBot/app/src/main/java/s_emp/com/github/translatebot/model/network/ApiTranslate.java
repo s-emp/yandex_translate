@@ -1,13 +1,10 @@
-package s_emp.com.github.translatebot.model;
-
-import android.app.Application;
+package s_emp.com.github.translatebot.model.network;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 
 import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
-import s_emp.com.github.translatebot.model.IClient;
 import s_emp.com.github.translatebot.other.Const;
 
 public class ApiTranslate {

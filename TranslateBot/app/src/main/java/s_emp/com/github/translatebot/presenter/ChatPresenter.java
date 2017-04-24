@@ -1,18 +1,22 @@
 package s_emp.com.github.translatebot.presenter;
 
-import android.content.Context;
+import android.view.MenuItem;
+import android.widget.AdapterView;
 
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 
 import s_emp.com.github.translatebot.R;
-import s_emp.com.github.translatebot.model.TranslatorBot;
+import s_emp.com.github.translatebot.model.Language;
+import s_emp.com.github.translatebot.model.bot.Bot;
 import s_emp.com.github.translatebot.model.TypeMessage;
 import s_emp.com.github.translatebot.model.database.MessageDB;
 import s_emp.com.github.translatebot.other.Const;
+import s_emp.com.github.translatebot.other.Helper;
 import s_emp.com.github.translatebot.view.IChatView;
 
 import static s_emp.com.github.translatebot.model.TypeMessage.TRANSLATE;
@@ -20,37 +24,50 @@ import static s_emp.com.github.translatebot.model.TypeMessage.TRANSLATE;
 public class ChatPresenter implements IChatPresenter {
 
     private IChatView view;
-    private TranslatorBot bot;
+    private Bot bot;
     private Map<String, Object> map;
 
     // Чат
     private ArrayList<Map<String, Object>> dataChat = new ArrayList<>();
     private MessageSimpleAdapter chatAdapter;
 
+    // Языки
+    private ArrayList<Language> dataToLanguage = new ArrayList<>();
+    private SpinnerAdapter toLanguageAdadpter;
 
-    // Боковое меню
-    private ArrayList<Map<String, Object>> dataItems = new ArrayList<>();
-    private MessageSimpleAdapter itemsMenuAdapter;
+    private ArrayList<Language> dataFromLanguage = new ArrayList<>();
+    private SpinnerAdapter fromLanguageAdadpter;
 
     //TODO не уверен что это должно тут находиться
-    final static String MESSAGE_TEXT = "message";
-    final static String MESSAGE_IMAGE = "imageBot";
+    private final static String MESSAGE_TEXT = "message";
+    private final static String MESSAGE_IMAGE = "imageBot";
+    private final static String SYS_IS_BOT = "bot";
+    private final static String SYS_IS_HIST = "hist";
+    private final static String SYS_IS_MARK = "mark";
+    private final static String SYS_ID_HIST = "id_hist";
+    private final static String SYS_ID_MARK = "id_mark";
+
+    // Последний выполненый перевод, для закладок
+    private String userText;
+    private String botText;
 
     public ChatPresenter(IChatView view) {
         this.view = view;
-        bot = new TranslatorBot(view);
+        bot = new Bot(view, this);
         String[] fromChat = {MESSAGE_TEXT, MESSAGE_IMAGE};
         int[] toChat = {R.id.message, R.id.imageBot};
         chatAdapter = new MessageSimpleAdapter(view.getActivity(), dataChat,
                 R.layout.message, fromChat, toChat);
 
-        String[] fromIntems = {MESSAGE_IMAGE};
-        int[] toItems = {R.id.imageAction};
-        itemsMenuAdapter = new MessageSimpleAdapter(view.getActivity(), dataItems,
-                R.layout.item_action, fromIntems, toItems);
-
         view.getChat().setAdapter(chatAdapter);
-        view.getMenu().setAdapter(itemsMenuAdapter);
+
+        toLanguageAdadpter = new SpinnerAdapter(view.getActivity(), dataToLanguage);
+        view.getToLanguage().setAdapter(toLanguageAdadpter);
+
+        fromLanguageAdadpter = new SpinnerAdapter(view.getActivity(), dataFromLanguage);
+        view.getFromLanguage().setAdapter(fromLanguageAdadpter);
+
+
     }
 
     @Override
@@ -58,12 +75,13 @@ public class ChatPresenter implements IChatPresenter {
         ArrayList<MessageDB> history = bot.getDataBase().getHist(count);
         for (int i = 0; i < history.size(); i++) {
             map = new HashMap<>();
+            map.put(SYS_ID_HIST, history.get(i).getId());
+            map.put(SYS_ID_MARK, 0);
             map.put(MESSAGE_TEXT, history.get(i).getMessage());
-            if (history.get(i).getMessage().indexOf(Const.FLAG_PEOPLE) >= 0) {
-                map.put(MESSAGE_IMAGE, null);
-            } else {
-                map.put(MESSAGE_IMAGE, view.getItemImageBot());
-            }
+            map.put(MESSAGE_IMAGE, view.getItemImageBot());
+            map.put(SYS_IS_BOT, true);
+            map.put(SYS_IS_HIST, true);
+            map.put(SYS_IS_MARK, false);
             dataChat.add(map);
         }
         chatAdapter.notifyDataSetChanged();
@@ -71,37 +89,39 @@ public class ChatPresenter implements IChatPresenter {
     }
 
     @Override
-    public void getMenu() {
-        for (int i = 0; i < 3; i++) {
-            map = new HashMap<>();
-            map.put(MESSAGE_IMAGE, view.getItemImageBot());
-            dataItems.add(map);
-        }
-    }
-
-    @Override
-    public void sendMessage(String message) {
-        Message msg = parsingMessage(message);
-        switch (msg.getTypeMessage()) {
+    public void sendMessage(TypeMessage typeMessage, String message) {
+        switch (typeMessage) {
             case TRANSLATE:
-                Map<String, Object> tmp = new HashMap<>();
-                tmp.put(MESSAGE_TEXT, Const.FLAG_PEOPLE + msg.getSourceText());
-                tmp.put(MESSAGE_IMAGE, null);
-                dataChat.add(tmp);
-                chatAdapter.notifyDataSetChanged();
+                updateData(false, Const.FLAG_PEOPLE + message, true, false);
+                setUserText(message);
                 try {
-                    bot.translate(msg, this);
+                    // Если изначально не было инета, попробуем получить список языков
+                    if (dataFromLanguage.size() < 1) {
+                        bot.refreshMapLangs(this);
+                    }
+                    bot.translate(message, this);
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
+                break;
+            default: updateData(false, Const.FLAG_PEOPLE + message, false, false);
+                updateData(true, view.getActivity().getString(R.string.FAQ), false, false);
         }
     }
 
     @Override
-    public void updateData(ITranslatable translatedObj) {
+    synchronized public void updateData(boolean isBot, String text, boolean isHist, boolean isMark) {
         map = new HashMap<>();
-        map.put(MESSAGE_TEXT, translatedObj.getTranslateText());
-        map.put(MESSAGE_IMAGE, view.getItemImageBot());
+        if (isBot) {
+            map.put(MESSAGE_TEXT, Helper.messageBot(text));
+            map.put(MESSAGE_IMAGE, view.getItemImageBot());
+        } else {
+            map.put(MESSAGE_TEXT, text);
+            map.put(MESSAGE_IMAGE, null);
+        }
+        map.put(SYS_IS_HIST, isHist);
+        map.put(SYS_IS_MARK, isMark);
+        map.put(SYS_IS_BOT, isBot);
         dataChat.add(map);
         chatAdapter.notifyDataSetChanged();
         view.getChat().smoothScrollToPosition(dataChat.size());
@@ -123,6 +143,144 @@ public class ChatPresenter implements IChatPresenter {
 
     @Override
     public void switchLanguage() {
-        bot.setToLang();
+        if (!bot.isAutoLang()) {
+            bot.setToLang(bot.getFromLang());
+            view.switchLanguage();
+        }
+    }
+
+    @Override
+    public void determiteSuccess(String lang) {
+        updateData(true, " Возможно исходный текст: " + bot.getNameLanguage(lang), false, false);
+    }
+
+    @Override
+    public void determiteError(Integer code, String message) {
+        updateData(true, "Упс что то пошло не так: \n" + message, false, false);
+    }
+
+    @Override
+    public void translateSuccess(MessageDB text) {
+        updateData(true, text.getMessage(), true, false);
+        setBotText(text.getMessage());
+    }
+
+    @Override
+    public void translateError(Integer code, MessageDB text) {
+        updateData(true, "Упс... " + text.getMessage(), false, false);
+    }
+
+    @Override
+    public void updateListLanguage(ArrayList<Language> fromLanguage, ArrayList<Language> toLanguage) {
+        dataFromLanguage.clear();
+        dataToLanguage.clear();
+
+        for (Language lang: fromLanguage) {
+            dataFromLanguage.add(lang);
+        }
+        for (Language lang: toLanguage) {
+            dataToLanguage.add(lang);
+        }
+
+        toLanguageAdadpter.notifyDataSetChanged();
+        fromLanguageAdadpter.notifyDataSetChanged();
+
+        view.defaultTranslateLanguage();
+
+        // Изменим язык перевода на отображаемый
+        if (fromLanguage.size() >= 0) {
+            bot.setFromLang(fromLanguage.get(0).getUi());
+        }
+        if (toLanguage.size() >= 0) {
+            bot.setToLang(toLanguage.get(0).getUi());
+        }
+
+    }
+
+    @Override
+    public void setFromLanguage(int position) {
+        bot.setFromLang(dataFromLanguage.get(position).getUi());
+    }
+
+    @Override
+    public void setToLanguage(int position) {
+        bot.setToLang(dataToLanguage.get(position).getUi());
+    }
+
+    @Override
+    public void addMark() {
+        if (userText != null && botText != null) {
+            bot.addMark(new MessageDB(1, "Исх: " + userText + "\nПер:" +
+                    botText.substring(botText.indexOf("Пер:")+4)));
+            view.systemMessage("Закладка успешно добавлена");
+            userText = null;
+            botText = null;
+        } else {
+            view.systemMessage("К сожалению нельзя добавить закладку");
+        }
+    }
+
+    @Override
+    public void downChat() {
+        view.getChat().smoothScrollToPosition(dataChat.size());
+    }
+
+    @Override
+    public void deleteHistory() {
+        bot.deleteHist();
+        dataChat.clear();
+        chatAdapter.notifyDataSetChanged();
+    }
+
+    @Override
+    public void deleteMark(MenuItem item) {
+        if (item == null) {
+            bot.deleteMark(-1);
+            view.systemMessage("Все закладки удалены");
+        } else {
+            AdapterView.AdapterContextMenuInfo info = (AdapterView.AdapterContextMenuInfo) item.getMenuInfo();
+            Map<String, Object> tmp = dataChat.get(info.position);
+            if (tmp.get(SYS_ID_MARK) != null) {
+                bot.deleteMark((int) tmp.get(SYS_ID_MARK));
+            }
+        }
+    }
+
+    @Override
+    public void showAllMark() {
+        ArrayList<MessageDB> marks = bot.getMark();
+        for (MessageDB msg :
+                marks) {
+            updateData(true, msg.getMessage(), false, true);
+        }
+    }
+
+    public void setUserText(String userText) {
+        this.userText = userText;
+        botText = null;
+    }
+
+    public void setBotText(String botText) {
+        this.botText = botText;
+    }
+
+    @Override
+    public int getPositionFromLanguage(String ui) {
+        for (int i = 0; i < dataFromLanguage.size(); i++) {
+            if (dataFromLanguage.get(i).getUi().equals(ui)) {
+                return i;
+            }
+        }
+        return -1;
+    }
+
+    @Override
+    public int getPositionToLanguage(String ui) {
+        for (int i = 0; i < dataToLanguage.size(); i++) {
+            if (dataToLanguage.get(i).getUi().equals(ui)) {
+                return i;
+            }
+        }
+        return -1;
     }
 }

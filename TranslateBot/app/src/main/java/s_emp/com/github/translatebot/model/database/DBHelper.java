@@ -68,21 +68,22 @@ public class DBHelper extends SQLiteOpenHelper implements IHistory, IMark {
         ContentValues contentValues = new ContentValues();
         contentValues.put(COL_HIST_BOT, obj.getIsBot());
         contentValues.put(COL_HIST_MESSAGE, obj.getMessage());
-        database.insert(TABLE_HISTORY, null, contentValues);
+        long id = database.insert(TABLE_HISTORY, null, contentValues);
         database.close();
+        obj.setId(id);
     }
 
     @Override
     public ArrayList<MessageDB> getHist(int count) {
 
         ArrayList<MessageDB> hists = new ArrayList<>();
-        SQLiteDatabase db = this.getWritableDatabase();
+        SQLiteDatabase database = this.getWritableDatabase();
         Cursor cr;
         if (count > 0) {
-            cr = db.query(TABLE_HISTORY, null, null, null, null, null,
+            cr = database.query(TABLE_HISTORY, null, null, null, null, null,
                     COL_HIST_ID, Integer.toString(count));
         } else {
-            cr = db.query(TABLE_HISTORY, null, null, null, null, null,
+            cr = database.query(TABLE_HISTORY, null, null, null, null, null,
                     COL_HIST_ID, null);
         }
 
@@ -91,7 +92,7 @@ public class DBHelper extends SQLiteOpenHelper implements IHistory, IMark {
                 hists.add(new MessageDB(cr.getInt(0), cr.getInt(1), cr.getString(2)));
             } while (cr.moveToNext());
         }
-        db.close();
+        database.close();
         return hists;
     }
 
@@ -112,16 +113,16 @@ public class DBHelper extends SQLiteOpenHelper implements IHistory, IMark {
 
     @Override
     public void deleteHist(int index) {
-        SQLiteDatabase db = this.getWritableDatabase();
-        db.delete(TABLE_HISTORY, COL_HIST_ID + " = ?", new String[]{Integer.toString(index)});
-        db.close();
+        SQLiteDatabase database = this.getWritableDatabase();
+        database.delete(TABLE_HISTORY, COL_HIST_ID + " = ?", new String[]{Integer.toString(index)});
+        database.close();
     }
 
     @Override
     public void deleteHist() {
-        SQLiteDatabase db = this.getWritableDatabase();
-        db.delete(TABLE_HISTORY, null, null);
-        db.close();
+        SQLiteDatabase database = this.getWritableDatabase();
+        database.delete(TABLE_HISTORY, null, null);
+        database.close();
     }
 
 
@@ -131,17 +132,37 @@ public class DBHelper extends SQLiteOpenHelper implements IHistory, IMark {
 
     @Override
     public ArrayList<MessageDB> getMark() {
-        return null;
+        ArrayList<MessageDB> marks = new ArrayList<>();
+        SQLiteDatabase database = this.getWritableDatabase();
+        Cursor cursor;
+        cursor = database.query(TABLE_MARK, null, null, null, null, null,
+                COL_MARK_ID, null);
+        if (cursor.moveToFirst()) {
+            do {
+                marks.add(new MessageDB(cursor.getInt(0), cursor.getInt(1), cursor.getString(2)));
+            } while (cursor.moveToNext());
+        }
+        database.close();
+        return marks;
     }
 
     @Override
     public void deleteMark(int index) {
-
+        if (index < 0) {
+            SQLiteDatabase database = this.getWritableDatabase();
+            database.delete(TABLE_MARK, null, null);
+            database.close();
+        }
     }
 
     @Override
     public void addMark(MessageDB mark) {
-
+        SQLiteDatabase database = this.getWritableDatabase();
+        ContentValues contentValues = new ContentValues();
+        contentValues.put(COL_MARK_BOT, mark.getIsBot());
+        contentValues.put(COL_MARK_MESSAGE, mark.getMessage());
+        database.insert(TABLE_MARK, null, contentValues);
+        database.close();
     }
 
 

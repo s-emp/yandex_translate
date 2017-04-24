@@ -4,7 +4,7 @@ import s_emp.com.github.translatebot.presenter.ITranslatable;
 
 public class MessageDB {
 
-    private int id;
+    private long id;
     private int isBot;
     private String message;
 
@@ -32,7 +32,7 @@ public class MessageDB {
 
     // region Get
 
-    public int getId() {
+    public long getId() {
         return id;
     }
 
@@ -50,7 +50,7 @@ public class MessageDB {
 
     // region Set
 
-    public void setId(int id) {
+    public void setId(long id) {
         this.id = id;
     }
 

@@ -1,4 +1,4 @@
-package s_emp.com.github.translatebot.model;
+package s_emp.com.github.translatebot.model.network;
 
 import java.util.Map;
 

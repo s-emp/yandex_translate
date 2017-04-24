@@ -3,14 +3,26 @@
     <!-- Base application theme. -->
     <style name="AppTheme" parent="Theme.AppCompat.Light.NoActionBar">
         <!-- Customize your theme here. -->
-        <item name="colorPrimary">@color/colorPrimary</item>
-        <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
-        <item name="colorAccent">@color/colorAccent</item>
+        <item name="colorPrimary">@color/blackElement</item>
+        <item name="colorPrimaryDark">@color/blackMain3</item>
+        <item name="colorAccent">@color/blackElement</item>
+        <item name="colorControlNormal">@color/blackElement</item>
+        <item name="android:popupBackground">@color/blackElement</item>
         <item name="android:editTextBackground">@drawable/darktheme_edit_text_holo_dark</item>
         <item name="android:colorEdgeEffect">@color/blackElement</item>
     </style>
 
     <style name="SplashTheme" parent="Theme.AppCompat.NoActionBar">
         <item name="android:windowBackground">@drawable/launch_screen</item>
+    </style>
+
+    <style name="ThemeSpinner">
+        <!-- Color when pressed -->
+        <item name="colorAccent">#ffffff</item>
+        <!-- Default color for the dropdown arrow and line -->
+        <item name="colorControlNormal">#ffffff</item>
+        <item name="android:popupBackground">#DFFFFFFF</item>
+        <item name="android:background">@drawable/abc_spinner_textfield_background_material</item>
+        <item name="android:textColor">@color/blackElement</item>
     </style>
 </resources>
